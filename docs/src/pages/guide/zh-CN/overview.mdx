@@ -1,0 +1,66 @@
+---
+layout: ../../layouts/PageLayout.astro
+title: 概览
+description: 使用 VeeValidate 的入门
+order: 1
+---
+
+import DocTip from '@/components/DocTip.vue';
+
+# 为什么选择 vee-validate
+
+"表单" 是前端开发中的一个难点。不仅要确保提交的值正确，还需要为用户提供良好的使用体验。
+
+从头构建表单需要大量工作，而且你可能无法覆盖未来所有需求。
+
+**你用于实现自己表单解决方案的时间，不如用在开发应用逻辑上。**
+
+大多数表单库能够让你节省丰富的开发时间，而 `vee-validate` 将大量痛点调理并给你更好的使用高度自由：
+
+- 表单状态和值的跟踪
+- UX 体验
+- 同步和异步验证
+- 提交处理
+
+vee-validate 尝试对这些问题进行抽象，并且完全不涉及 UI。这样做或许是一把双刃剑，但覆盖 UI 与样式往往是许多组件库和设计语言失败的原因。
+
+因此，vee-validate 将这些难点抽象为纯粹的逻辑组合，你可以轻松接入现有 UI 和组件。无需覆盖任何内容，也没有隐藏成本。你还可以在内部组件中使用 vee-validate，以此构建自己的表单库，而不用操心这些麻烦。
+
+这种方式的优秀示例是 vee-validate 如何无需特殊处理或工作，即可无障碍地 [整合各类 Vue.js UI 组件库](/examples/ui-libraries/)。
+
+## 开始使用
+
+vee-validate 提供两种方式为表单添加验证。
+
+- **Composition API**：推荐使用，能够与现有 UI 或任意第三方组件库无缝集成。
+- **高阶组件 (HOC)**：使用简单，只需在模板中书写，适合表单较为简单且不想写太多 JavaScript 的场景。
+
+两种方式可以灵活混用，按需选择。
+
+<DocTip title="Setup SFC">
+
+文档中的例子大多使用新的 [script setup](https://vuejs.org/api/sfc-script-setup.html#script-setup) SFC 语法以简洁为优。如果你追踪困难，请先了解一下它。
+
+</DocTip>
+
+### 通过包管理器安装
+
+如果你工作流程进行新一代编译，可以通过 `yarn`，`npm` 或 `pnpm` 安装 vee-validate：
+
+```sh
+yarn add vee-validate
+# 或
+npm i vee-validate --save
+# 或
+pnpm add vee-validate
+```
+
+### 通过脚本标签
+
+你也可以通过 CDN 通过脚本标签引入 vee-validate：
+
+```html
+<script src="https://unpkg.com/vee-validate"></script>
+```
+
+这会添加一个 `VeeValidate` 全局对象，你可以通过它访问 vee-validate 提供的各种组件和函数。

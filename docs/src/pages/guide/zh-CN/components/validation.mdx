@@ -1,0 +1,244 @@
+---
+layout: ../../../layouts/PageLayout.astro
+title: 验证
+description: 字段级和表单级验证以及验证行为和错误消息
+order: 2
+next:
+  path: guide/components/handling-forms
+  title: 处理表单
+  description: 处理表单状态和提交
+---
+
+import DocTip from '@/components/DocTip.vue';
+import LiveExample from '@/components/LiveExample.vue';
+
+# 验证
+
+vee-validate 能够轻松地处理复杂的校验，既支持同步也支持异步验证，
+你可以在字段层面或表单层面（通过校验模式）定义规则，并且内置了对 [yup](https://github.com/jquense/yup) 的支持。
+
+在你的表单中将会使用以下几个组件：
+
+- `Field`：代表单个输入项，可渲染任意 HTML 元素或 Vue 组件。
+- `Form`：渲染表单。请勿将 `<Form>` 标签与 HTML 的 `<form>` 混淆。
+- `ErrorMessage`：展示字段的错误信息。并非必须使用，因为显示错误的方式很多。
+
+下面是一个最简单的示例：
+
+<p
+  class="codepen"
+  data-height="265"
+  data-theme-id="light"
+  data-default-tab="js,result"
+  data-user="logaretm"
+  data-slug-hash="rNxbMzq"
+  style="height: 265px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;"
+  data-pen-title="Basic Example"
+>
+  <span>
+    查看 <a href="https://codepen.io/logaretm/pen/rNxbMzq">Basic Example</a>，作者 Abdelrahman Awad (
+    <a href="https://codepen.io/logaretm">@logaretm</a>) 于 <a href="https://codepen.io">CodePen</a>.
+  </span>
+</p>
+
+<DocTip>
+
+从此处开始，文档假定你已具备 [Vue SFC](https://v3.vuejs.org/guide/single-file-component.html) 基础，示例也将以此为基础，并使用 ES6+ 代码片段，如果尚未熟悉，请先阅读相关内容。
+
+</DocTip>
+
+## 字段级验证
+
+你可以在 `Field` 组件上定义验证规则，这些规则可以简单到只接收当前值并返回错误消息的函数。
+
+```vue
+<template>
+  <Form>
+    <Field name="field" :rules="isRequired" />
+    <ErrorMessage name="field" />
+  </Form>
+</template>
+
+<script setup>
+import { Field, Form, ErrorMessage } from 'vee-validate';
+
+function isRequired(value) {
+  if (value && value.trim()) {
+    return true;
+  }
+
+  return '必填项';
+}
+</script>
+```
+
+### 使用 yup 进行字段校验
+
+[`yup`](https://github.com/jquense/yup) 是一个简单而强大的 JavaScript 数据验证库，
+可以与 vee-validate 配合使用。利用 `yup` 来定义字段的验证规则如下：
+
+```vue{3,10,20}
+<template>
+  <Form>
+    <Field name="password" type="password" :rules="passwordRules" />
+    <ErrorMessage name="password" />
+  </Form>
+</template>
+
+<script setup>
+import { Field, Form, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
+
+const passwordRules = yup.string().required().min(8);
+</script>
+```
+
+关于 `Field` 组件的更多信息，请查看 [API 参考](/api/field)。
+
+## 表单级验证
+
+vee-validate 支持使用验证模式来一次性定义所有字段的规则，
+这样就无需在每个字段上分别定义。对于大型表单来说能保持模板更加清晰。
+
+一个简单的验证模式是一个对象，其中键为字段名，值为相应的验证函数：
+
+```vue
+<template>
+  <Form @submit="submit" :validation-schema="simpleSchema">
+    <Field name="email" />
+    <ErrorMessage name="email" />
+
+    <Field name="password" type="password" />
+    <ErrorMessage name="password" />
+
+    <button>提交</button>
+  </Form>
+</template>
+
+<script setup>
+import { Form, Field, ErrorMessage } from 'vee-validate';
+
+const simpleSchema = {
+  email(value) {
+    // 验证 email
+  },
+  name(value) {
+    // 验证 name
+  },
+  // 如果已定义全局规则也可以直接使用
+  password: 'required|min:8',
+  // ...
+};
+</script>
+```
+
+### 使用 yup 定义验证模式
+
+幸运的是，使用 `yup` 构建表单验证模式十分方便，你可以创建如下对象：
+
+```js
+const schema = yup.object({
+  email: yup.string().required().email(),
+  name: yup.string().required(),
+  password: yup.string().required().min(8),
+});
+```
+
+vee-validate 对 yup 模式提供内置支持，通过 `validation-schema` 属性传递给 `<Form />` 组件即可：
+
+```vue
+<template>
+  <Form @submit="submit" :validation-schema="schema">
+    <Field name="email" />
+    <ErrorMessage name="email" />
+
+    <Field name="password" type="password" />
+    <ErrorMessage name="password" />
+
+    <button>提交</button>
+  </Form>
+</template>
+
+<script setup>
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
+
+const schema = yup.object({
+  email: yup.string().required().email(),
+  password: yup.string().required().min(8),
+});
+</script>
+```
+
+关于 `Form` 组件的更多信息，请查看 [API 参考](/api/form)。
+
+<DocTip title="Yup 模式优化" type="warn">
+
+使用 `yup` 验证模式时有一些优化注意事项，请参阅 [最佳实践指南](/guide/best-practices)。
+
+</DocTip>
+
+<DocTip title="Zod 模式插件">
+
+官方还提供了对 [Zod 验证](https://github.com/colinhacks/zod) 的集成，可作为 `yup` 的替代方案，详见 [zod 集成页面](/integrations/zod-schema-validation)。
+
+</DocTip>
+
+### 响应式表单模式
+
+如果需要动态构建验证模式，可以使用 `computed` 创建响应式的模式，无论是 `yup` 还是对象形式都适用：
+
+```js
+import * as yup from 'yup';
+
+export default {
+  data: () => ({
+    min: 6,
+  }),
+  computed: {
+    schema() {
+      return yup.object({
+        password: yup.string().min(this.min),
+      });
+    },
+  },
+};
+```
+
+```vue
+<template>
+  <Form @submit="submit" :validation-schema="schema">
+    <Field name="password" type="password" />
+    <ErrorMessage name="password" />
+
+    <button>提交</button>
+  </Form>
+</template>
+
+<script>
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
+
+export default {
+  components: {
+    Form,
+    Field,
+    ErrorMessage,
+  },
+  data: () => ({
+    min: 6,
+  }),
+  computed: {
+    schema() {
+      return yup.object({
+        password: yup.string().min(this.min),
+      });
+    },
+  },
+};
+</script>
+```
+
+当验证模式发生变化时，仅会重新验证之前验证过的字段，其余字段不会再次验证，以避免过度验证行为。
+
+<!-- 文档剩余部分待补充翻译 -->

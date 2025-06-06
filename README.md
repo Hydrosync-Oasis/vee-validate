@@ -30,6 +30,7 @@ Painless Vue forms
 </p>
 
 <br>
+阅读简体中文版本请查看 [README.zh-CN.md](README.zh-CN.md)
 
 <p align="center">
   <a href="https://github.com/sponsors/logaretm">
